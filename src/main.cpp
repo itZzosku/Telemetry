@@ -53,7 +53,7 @@ const char *myWriteAPIKey = Telemetry_WRITE_APIKEY;
 
 // Initialize our values
 float Temperature = 0;
-float Humidity = 0;
+float Humidity = 0; 
 float Pressure = 0;
 
 
@@ -92,6 +92,10 @@ void loop()
     while (WiFi.status() != WL_CONNECTED)
     {
       WiFi.begin(ssid, pass); // Connect to WPA/WPA2 network. Change this line if using open or WEP network
+      delay(1);
+      WiFi.setHostname("Telemetry_ESP32_Node");
+      delay(1);
+      Serial.println(WiFi.getHostname());
       Serial.print(".");
       delay(5000);
     }
@@ -106,16 +110,18 @@ void loop()
     return;
   }
   Serial.print("Temperature = ");
-  Serial.print(bme.temperature);
+  Temperature = (bme.temperature);
+  Serial.print(Temperature);
   Serial.println(" *C");
 
   Serial.print("Pressure = ");
-  Serial.print(bme.pressure / 100.0);
-  Pressure = (bme.pressure / 100.0);
+  Pressure = (bme.pressure / 100.0 + 17.5);
+  Serial.print(Pressure);
   Serial.println(" hPa");
 
   Serial.print("Humidity = ");
-  Serial.print(bme.humidity);
+  Humidity = (bme.humidity);
+  Serial.print(Humidity);
   Serial.println(" %");
 
   Serial.print("Gas = ");
@@ -130,8 +136,8 @@ void loop()
 
 
   // set the fields with the values
-  ThingSpeak.setField(1, bme.temperature);
-  ThingSpeak.setField(2, bme.humidity);
+  ThingSpeak.setField(1, Temperature);
+  ThingSpeak.setField(2, Humidity);
   ThingSpeak.setField(3, Pressure);
 
   // write to the ThingSpeak channel
