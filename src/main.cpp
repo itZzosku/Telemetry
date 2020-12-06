@@ -24,7 +24,6 @@
 */
 
 #include <ThingSpeak.h>
-#include "secrets.h"
 #include <WiFi.h>
 
 #include <Wire.h>
@@ -56,6 +55,13 @@ float Temperature = 0;
 float Humidity = 0; 
 float Pressure = 0;
 
+float TemperatureCalibrated = 0;
+float HumidityCalibrated = 0;
+float PressureCalibrated = 0;
+
+double mapfloat(double x, double in_min, double in_max, double out_min, double out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 void setup()
 {
@@ -103,7 +109,6 @@ void loop()
   }
 
 
-
   if (!bme.performReading())
   {
     Serial.println("Failed to perform reading :(");
@@ -111,18 +116,21 @@ void loop()
   }
   Serial.print("Temperature = ");
   Temperature = (bme.temperature);
+  TemperatureCalibrated = mapfloat(Temperature, -0.4, 25.64, -1, 25.64);
   Serial.print(Temperature);
   Serial.println(" *C");
 
-  Serial.print("Pressure = ");
-  Pressure = (bme.pressure / 100.0 + 17.5);
-  Serial.print(Pressure);
-  Serial.println(" hPa");
-
   Serial.print("Humidity = ");
   Humidity = (bme.humidity);
+  HumidityCalibrated = mapfloat(Humidity, 18.85, 81.73200, 22.118, 85);
   Serial.print(Humidity);
   Serial.println(" %");
+
+  Serial.print("Pressure = ");
+  Pressure = (bme.pressure / 100.0);
+  PressureCalibrated = (Pressure + 17.40);
+  Serial.print(Pressure);
+  Serial.println(" hPa");
 
   Serial.print("Gas = ");
   Serial.print(bme.gas_resistance / 1000.0);
@@ -136,9 +144,9 @@ void loop()
 
 
   // set the fields with the values
-  ThingSpeak.setField(1, Temperature);
-  ThingSpeak.setField(2, Humidity);
-  ThingSpeak.setField(3, Pressure);
+  ThingSpeak.setField(1, TemperatureCalibrated);
+  ThingSpeak.setField(2, HumidityCalibrated);
+  ThingSpeak.setField(3, PressureCalibrated);
 
   // write to the ThingSpeak channel
   int x = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
