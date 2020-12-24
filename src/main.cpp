@@ -53,7 +53,8 @@ const char *mqtt_server = "192.168.1.5";
 WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
-char msg[200];
+#define MSG_BUFFER_SIZE	(200)
+char msg[MSG_BUFFER_SIZE];
 int value = 0;
 
 // Initialize our values
@@ -201,6 +202,7 @@ void loop()
       Serial.println("Failed to perform reading :(");
       return;
     }
+
     Serial.print("Temperature = ");
     Temperature = (bme.temperature);
     TemperatureCalibrated = mapfloat(Temperature, -0.4, 25.64, -1, 25.64);
@@ -242,7 +244,8 @@ void loop()
 
     Serial.print("Publish message: ");
     Serial.println(msg);
-    delay(1000);
-    client.publish("Temperature/Values", msg);
+    Serial.println();
+    client.publish("Values", msg);
+    client.disconnect();
   }
 }
