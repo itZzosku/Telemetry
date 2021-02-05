@@ -18,33 +18,6 @@
  To install the ESP32 Arduino:
   - https://github.com/espressif/arduino-esp32
 
- #include "Adafruit_seesaw.h"
-
-Adafruit_seesaw ss;
-
-void setup() {
-  Serial.begin(115200);
-
-  Serial.println("seesaw Soil Sensor example!");
-  
-  if (!ss.begin(0x36)) {
-    Serial.println("ERROR! seesaw not found");
-    while(1);
-  } else {
-    Serial.print("seesaw started! version: ");
-    Serial.println(ss.getVersion(), HEX);
-  }
-}
-
-void loop() {
-  float tempC = ss.getTemp();
-  uint16_t capread = ss.touchRead(0);
-
-  Serial.print("Temperature: "); Serial.print(tempC); Serial.println("*C");
-  Serial.print("Capacitive: "); Serial.println(capread);
-  delay(100);
-} 
-
 */
 
 #include <WiFi.h>
@@ -56,7 +29,6 @@ void loop() {
 #include <Adafruit_BME680.h>
 
 #include <ArduinoJson.h>
-#include "Adafruit_seesaw.h"
 
 #include <credentials.h>
 
@@ -68,8 +40,6 @@ void loop() {
 #define I2C_SCL 22
 
 #define SEALEVELPRESSURE_HPA (1013.25)
-
-Adafruit_seesaw ss;
 
 Adafruit_BME680 bme; // I2C
 //Adafruit_BME680 bme(BME_CS); // hardware SPI
@@ -95,9 +65,6 @@ float Pressure = 0;
 float TemperatureCalibrated = 0;
 float HumidityCalibrated = 0;
 float PressureCalibrated = 0;
-
-float tempCCalibrated = 0;
-float capreadCalibrated = 0;
 
 String JSONmessage;
 
@@ -214,16 +181,6 @@ void setup()
   bme.setPressureOversampling(BME680_OS_4X);
   bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
   bme.setGasHeater(320, 150); // 320*C for 150 ms
-
-  Serial.println("seesaw Soil Sensor example!");
-  
-  if (!ss.begin(0x36)) {
-    Serial.println("ERROR! seesaw not found");
-    while(1);
-  } else {
-    Serial.print("seesaw started! version: ");
-    Serial.println(ss.getVersion(), HEX);
-  }
 }
 
 void loop()
@@ -274,27 +231,12 @@ void loop()
 
     Serial.println();
 
-    float tempC = ss.getTemp();
-    uint16_t capread = ss.touchRead(0);
-
-    tempCCalibrated = mapfloat(tempC, 18.85, 81.73200, 22.118, 85);
-    capreadCalibrated = mapfloat(capread, 18.85, 81.73200, 22.118, 85);
-
-    Serial.print("Temperature: "); Serial.print(tempC); Serial.println("*C");
-    Serial.print("Capacitive: "); Serial.println(capread);
-    Serial.print("Temperature: "); Serial.print(tempCCalibrated); Serial.println("*C");
-    Serial.print("Capacitive: "); Serial.println(capreadCalibrated);
-
     DynamicJsonDocument doc(64);
 
     doc["Sensor"] = "BME680";
     doc["Temperature"] = TemperatureCalibrated;
     doc["Humidity"] = HumidityCalibrated;
     doc["Pressure"] = PressureCalibrated;
-    doc["Sensor"] = "Capacitive Moisture Sensor";
-    doc["SoilHumidity"] = capread;
-    doc["SoilTemperature"] = tempC;
-
 
     JSONmessage = "";
     serializeJson(doc, JSONmessage);
