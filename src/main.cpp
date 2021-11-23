@@ -245,7 +245,7 @@ void loop()
     Serial.print("Publish message: ");
     Serial.println(msg);
     Serial.println();
-    client.publish("Values", msg);
+    client.publish("TemperatureValues", msg);
     client.disconnect();
   }
 }
