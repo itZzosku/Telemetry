@@ -48,7 +48,10 @@ Adafruit_BME680 bme; // I2C
 // Update these with values suitable for your network.
 const char *ssid = WIFI_SSID;
 const char *password = WIFI_PASS;
+
 const char *mqtt_server = "192.168.1.5";
+const char *mqtt_id = MQTT_ID;
+const char *mqtt_pass = MQTT_PASS;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -136,7 +139,7 @@ void reconnect()
     String clientId = "ESP32Client-";
     clientId += String(random(0xffff), HEX);
     // Attempt to connect
-    if (client.connect(clientId.c_str()))
+    if (client.connect(clientId.c_str(), mqtt_id, mqtt_pass))
     {
       Serial.println("connected");
       // Once connected, publish an announcement...
