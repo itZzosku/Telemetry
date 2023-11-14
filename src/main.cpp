@@ -49,7 +49,7 @@ Adafruit_BME680 bme; // I2C
 const char *ssid = WIFI_SSID;
 const char *password = WIFI_PASS;
 
-const char *mqtt_server = "192.168.1.5";
+const char *mqtt_server = "192.168.1.22";
 const char *mqtt_id = MQTT_ID;
 const char *mqtt_pass = MQTT_PASS;
 
@@ -220,7 +220,7 @@ void loop()
 
     Serial.print("Pressure = ");
     Pressure = (bme.pressure / 100.0);
-    PressureCalibrated = (Pressure + 17.40);
+    PressureCalibrated = (Pressure + 0.86);
     Serial.print(PressureCalibrated);
     Serial.println(" hPa");
 
