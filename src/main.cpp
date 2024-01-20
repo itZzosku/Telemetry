@@ -190,7 +190,7 @@ void loop()
 {
 
   long now = millis();
-  if (now - lastMsg > 30000)
+  if (now - lastMsg > 20000)
   {
     lastMsg = now;
 
